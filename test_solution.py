@@ -1,9 +1,11 @@
 import unittest
 import numpy as np
-import solution  # your code with logistic regression and evaluation
-                 #  should be in solution.py
+import solution
+import pdb
+# your code with logistic regression and evaluation
+# should be in solution.py
 
-
+# data1: define data matrix and vector of classes and return the two matrices.
 def data1():
     X = np.array([[5.0, 3.6, 1.4, 0.2],
                      [5.4, 3.9, 1.7, 0.4],
@@ -17,6 +19,7 @@ def data1():
     return X, y
 
 
+# data2: define data matrix and vector of classes and return the two matrices.
 def data2():
     X, y = data1()
     X = X[:6]
@@ -24,9 +27,10 @@ def data2():
     return X[:6], y[:6]
 
 
+# TestLogisticRegression: perform unit tests
 class TestLogisticRegression(unittest.TestCase):
 
-    def test_h(self):
+    def test_h(self):  # **
         X, y = data1()
         self.assertAlmostEqual(solution.h(X[0], np.array([0, 0, 0, 0])), 0.5)
         self.assertAlmostEqual(
@@ -127,6 +131,8 @@ class DummyCVClassifier:
 class TestEvaluation(unittest.TestCase):
 
     def test_ca(self):
+        pdb.set_trace()
+
         X, y = data1()
         self.assertAlmostEqual(solution.CA(y, [[1, 0]]*len(y)), 0.5)
         self.assertAlmostEqual(solution.CA(y, [[0.5, 1]]*len(y)), 0.5)
