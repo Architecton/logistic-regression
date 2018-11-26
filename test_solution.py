@@ -1,6 +1,7 @@
 import unittest
 import numpy as np
 import solution
+import pdb
 # your code with logistic regression and evaluation
 # should be in solution.py
 

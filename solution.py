@@ -1,5 +1,7 @@
 import numpy as np
+import math
 from scipy.optimize import fmin_l_bfgs_b
+import pdb
 
 # TODO report: 1.12.2018
 
@@ -117,8 +119,37 @@ def test_learning(learner, X, y):
 
 # test_cv: test the prediction success using k-fold cross validation.
 def test_cv(learner, X, y, k=5):
-    # TODO 27.11.2018
-    pass
+    num_in_group = math.ceil(X.shape[0]/k)
+    pred = np.empty((0, 2), dtype=float)
+    for idx in range(0, X.shape[0], num_in_group):
+        # TODO test
+        test_rows = X[idx:min(idx + num_in_group, X.shape[0]), :]
+
+
+
+
+        train_rows = np.vstack((X[:idx, :], X[min(idx + num_in_group, X.shape[0]):, :]))
+
+
+
+        train_rows_target = np.hstack((y[:idx], y[min(idx + num_in_group, len(y)):]))
+
+
+
+        classifier = learner(train_rows, train_rows_target)
+
+
+
+        pred_next = np.apply_along_axis(classifier, 1, test_rows)
+
+
+
+        pred = np.vstack((pred, pred_next))
+
+
+
+
+    return pred
 
 
 # CA: compute classification accuracy given a vector of real classes
