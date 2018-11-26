@@ -1,7 +1,6 @@
 import unittest
 import numpy as np
 import solution
-import pdb
 # your code with logistic regression and evaluation
 # should be in solution.py
 
@@ -131,7 +130,6 @@ class DummyCVClassifier:
 class TestEvaluation(unittest.TestCase):
 
     def test_ca(self):
-        pdb.set_trace()
 
         X, y = data1()
         self.assertAlmostEqual(solution.CA(y, [[1, 0]]*len(y)), 0.5)

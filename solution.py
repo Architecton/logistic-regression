@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.optimize import fmin_l_bfgs_b
-import pdb
 
+# TODO report: 1.12.2018
 
 # load: open file and return the matrix of samples.
 def load(name):
@@ -75,6 +75,7 @@ class LogRegClassifier(object):
 
 # LogRegLearner: build a prediction model for the training data X with classes y.
 class LogRegLearner(object):
+    # TODO 28.11.2018
 
     # constructor
     def __init__(self, lambda_=0.0):
@@ -107,30 +108,37 @@ def test_learning(learner, X, y):
         res = test_learning(LogRegLearner(lambda_=0.0), X, y)
     """
     # Get trained classifier.
-    c = learner(X,y)
+    c = learner(X, y)
     # Go over samples in X and classify them.
     # Save results to list and return it.
     results = [c(x) for x in X]
     return results
 
 
-# test_cv: test the prediction success using 5-fold cross validation.
+# test_cv: test the prediction success using k-fold cross validation.
 def test_cv(learner, X, y, k=5):
+    # TODO 27.11.2018
     pass
 
 
 # CA: compute classification accuracy given a vector of real classes
 # and a vector of predictions.
 def CA(real, predictions):
-    # Get number of correct classifications - equal to dot product
-    num_correct = np.dot(real, predictions)
+    # Get vector of class predictions. The value in vector is 1 if predicted class is 1 and 0 otherwise.
+    prediction_classes = np.round(predictions)[:, 1]
+    # Get number of correct predictions.
+    num_correct = np.sum(np.equal(prediction_classes, real))
+    # Get proportion of correct classifications.
     return num_correct/len(real)
 
 
-# AUC: measure the classification accuracy using the area under durve.
+# AUC: measure the classification accuracy using the area under curve.
 def AUC(real, predictions):
+    # TODO 30.11.2018
     pass
 
+
+# REMOVE #####
 def data1():
     X = np.array([[5.0, 3.6, 1.4, 0.2],
                      [5.4, 3.9, 1.7, 0.4],
@@ -142,6 +150,7 @@ def data1():
                      [5.8, 2.7, 4.1, 1.0]])
     y = np.array([0, 0, 0, 0, 1, 1, 1, 1])
     return X, y
+
 
 # If running as script...
 if __name__ == "__main__":
