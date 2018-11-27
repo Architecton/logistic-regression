@@ -30,7 +30,7 @@ def data2():
 # TestLogisticRegression: perform unit tests
 class TestLogisticRegression(unittest.TestCase):
 
-    def test_h(self):  # **
+    def test_h(self):
         X, y = data1()
         self.assertAlmostEqual(solution.h(X[0], np.array([0, 0, 0, 0])), 0.5)
         self.assertAlmostEqual(
@@ -176,21 +176,24 @@ class TestEvaluation(unittest.TestCase):
             if signatures != list(map(lambda x: sum(list(x)), X)):
                 raise MixedOrder()
 
+    # test_cv_shuffled: test that the sets used in cross validation are not taken in blocks.
     def test_cv_shuffled(self):
         """Do not take folds in order
         - shuffle because data is frequently clustered """
-        _, y = data_iris()
-        X = np.array([[i] for i in range(100)])
+        _, y = data_iris()                       # Get target variable value from Iris dataset.
+        X = np.array([[i] for i in range(100)])  # Column vector of integers on interval [0, 99]
         pred = solution.test_cv(DummyShuffleLearner(), X, y, k=4)
-        self.assertIsNotNone(pred)
+        self.assertIsNotNone(pred)  # Assert that pred is not None.
 
 
 class TooManyConsecutiveInstances(Exception): pass
 
-
+# DummyShuffleLearner: used in the test_cv_shuffled function above
 class DummyShuffleLearner:
     """ For CV testing """
+    # Calling with X and y
     def __call__(self, X, y):
+        # Transpose X
         X = X.T
         notinorder = len(np.flatnonzero(np.abs(np.diff(X)) - 1))
         if notinorder < 8:

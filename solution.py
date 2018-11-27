@@ -1,7 +1,9 @@
-import numpy as np
 import math
-from scipy.optimize import fmin_l_bfgs_b
 import pdb
+
+import numpy as np
+from scipy.optimize import fmin_l_bfgs_b
+
 
 # TODO report: 1.12.2018
 
@@ -28,7 +30,7 @@ def h(x, theta):
 # cost: compute the value of the cost function given feature matrix X, target variable
 # values y, the weights theta and the regularization factor lambda.
 def cost(theta, X, y, lambda_):
-    return -1/X.shape[0] * np.sum([y[row_idx]*np.log(h(X[row_idx, :], theta)) + (1 - y[row_idx])*np.log(1 - h(X[row_idx, :], theta)) for row_idx in range(X.shape[0])])
+    return -1/X.shape[0] * np.sum([y[row_idx]*np.log(h(X[row_idx, :], theta)) + (1 - y[row_idx])*np.log(1 - h(X[row_idx, :], theta)) for row_idx in range(X.shape[0])]) + lambda_/X.shape[0] * sum(theta)**2
 
 
 # grad: the gradient of the cost function. Return a numpy vector that is the
@@ -36,9 +38,9 @@ def cost(theta, X, y, lambda_):
 def grad(theta, X, y, lambda_):
     # Allocate array for result.
     res = np.zeros(len(theta))
-    # Compute gradient values using derived forumla.
+    # Compute gradient values using derived formula.
     for col_idx in range(len(theta)):
-        res[col_idx] = -1/X.shape[0] * sum([(y[row_idx]  - h(X[row_idx, :], theta))*X[row_idx, col_idx] for row_idx in range(X.shape[0])])
+        res[col_idx] = -1/X.shape[0] * sum([(y[row_idx] - h(X[row_idx, :], theta)) * X[row_idx, col_idx] for row_idx in range(X.shape[0])]) + (2*lambda_)/X.shape[0] * theta[col_idx]
     return res
 
 
@@ -55,8 +57,8 @@ def num_grad(theta, X, y, lambda_):
         # Make a copy of the theta vector and take step in specified place.
         theta_aux = theta.copy()
         theta_aux[row_idx] = theta_aux[row_idx] + dtheta
-        # Compute partial derivative using definition.
-        res[row_idx] = (cost(theta_aux, X, y, lambda_) - cost(theta, X, y, lambda_)) / dtheta
+        # Compute partial derivative using definition. Add derivative of regularization term.
+        res[row_idx] = (cost(theta_aux, X, y, 0) - cost(theta, X, y, 0)) / dtheta + (2*lambda_)/X.shape[0] * theta[row_idx]
     return res
 
 
@@ -77,8 +79,6 @@ class LogRegClassifier(object):
 
 # LogRegLearner: build a prediction model for the training data X with classes y.
 class LogRegLearner(object):
-    # TODO 28.11.2018
-
     # constructor
     def __init__(self, lambda_=0.0):
         self.lambda_ = lambda_
@@ -119,36 +119,36 @@ def test_learning(learner, X, y):
 
 # test_cv: test the prediction success using k-fold cross validation.
 def test_cv(learner, X, y, k=5):
-    num_in_group = math.ceil(X.shape[0]/k)
+    # Shuffle the data matrix.
+    X_aux = np.hstack((X, np.reshape(y, [len(y), 1])))
+    X_aux = np.hstack((np.reshape(range(X_aux.shape[0]), [X_aux.shape[0], 1]), X_aux))
+    X_aux = np.random.permutation(X_aux)
+    y_perm = X_aux[:, -1]
+    X_perm = X_aux[:, 1:-1]
+    perm = X_aux[:, 0]
+    # Compute maximum number of samples in each group.
+    num_in_group = math.ceil(X_perm.shape[0]/k)
+    # Allocate starting array for prediction results matrix.
     pred = np.empty((0, 2), dtype=float)
-    for idx in range(0, X.shape[0], num_in_group):
-        # TODO test
-        test_rows = X[idx:min(idx + num_in_group, X.shape[0]), :]
-
-
-
-
-        train_rows = np.vstack((X[:idx, :], X[min(idx + num_in_group, X.shape[0]):, :]))
-
-
-
-        train_rows_target = np.hstack((y[:idx], y[min(idx + num_in_group, len(y)):]))
-
-
-
+    # Go over example sets.
+    for idx in range(0, X_perm.shape[0], num_in_group):
+        # Get testing rows.
+        test_rows = X_perm[idx:min(idx + num_in_group, X_perm.shape[0]), :]
+        # Get training rows.
+        train_rows = np.vstack((X_perm[:idx, :], X_perm[min(idx + num_in_group, X_perm.shape[0]):, :]))
+        # Get test rows target variable values.
+        train_rows_target = np.hstack((y_perm[:idx], y_perm[min(idx + num_in_group, len(y_perm)):]))
+        # Train classifier.
         classifier = learner(train_rows, train_rows_target)
-
-
-
+        # Get next set of predictions.
         pred_next = np.apply_along_axis(classifier, 1, test_rows)
-
-
-
+        # add next set of predictions to results matrix.
         pred = np.vstack((pred, pred_next))
 
-
-
-
+    # Apply inverse permutation to rows of matrix of predictions.
+    pred_aux = np.hstack((pred, np.reshape(perm, [perm.shape[0], 1])))
+    pred_aux = pred_aux[pred_aux[:, -1].argsort()]
+    pred = pred_aux[:, :-1]
     return pred
 
 
@@ -165,7 +165,7 @@ def CA(real, predictions):
 
 # AUC: measure the classification accuracy using the area under curve.
 def AUC(real, predictions):
-    # TODO 30.11.2018
+    # TODO 28.11.2018
     pass
 
 
