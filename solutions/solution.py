@@ -200,27 +200,3 @@ def AUC(real, predictions):
 
     # Compute and return AUC score.
     return roc_auc(real, pos_pred)
-
-
-# If running as script...
-if __name__ == "__main__":
-    X, y = load('reg.data')
-
-    # Make a linearly spaced list of 500 lambda values on interval [0, 7].
-    lam_vals = np.linspace(0, 1, 10)
-    acc_cv = np.empty(len(lam_vals), dtype=float)
-    acc_auc = np.empty(len(lam_vals), dtype=float)
-    # Go over lambda values and save computed classification accuracy.
-    for i, lam in enumerate(lam_vals):
-        learner = LogRegLearner(lambda_=lam)
-        pred = test_cv(learner, X, y, k=5)
-        acc_cv[i] = CA(y, pred)
-        acc_auc[i] = AUC(y, pred)
-
-
-    # Plot the accuracies with respect to lambda.
-    a = plt.plot(lam_vals, acc_auc, label='auc score')
-    b = plt.plot(lam_vals, acc_cv, label="percentage correct")
-    plt.legend(bbox_to_anchor=(0.866, 0.98), loc=2, borderaxespad=0.)
-    plt.title("Classification Accuracy", fontsize=20)
-    plt.show()

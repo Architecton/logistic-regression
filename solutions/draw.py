@@ -40,10 +40,11 @@ def draw_decision(X, y, classifier, at1, at2, lam, grid=50):
     pylab.show()
 
 
-X,y = solution.load('reg.data')
+if __name__ == "__main__":
+    X,y = solution.load('reg.data')
 
-lam = 2.3
-learner = solution.LogRegLearner(lambda_=lam)
-classifier = learner(X,y)
+    lam = 2.3
+    learner = solution.LogRegLearner(lambda_=lam)
+    classifier = learner(X,y)
 
-draw_decision(X, y, classifier, 0, 1, lam)
+    draw_decision(X, y, classifier, 0, 1, lam)
