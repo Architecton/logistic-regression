@@ -161,7 +161,6 @@ class TestEvaluation(unittest.TestCase):
     def test_cv(self):
         for X, y in [data1(), data2()]:
             pred = solution.test_cv(DummyCVLearner(), X, y, k=4)
-
             if len(y) == 8:
                 # training data should have 6 instances
                 self.assertEqual(pred[0][1], 6)

@@ -1,11 +1,9 @@
 import pylab
 import numpy as np
-
-from solution import LogRegLearner
-from solution import load
+import solution
 
 
-def draw_decision(X, y, classifier, at1, at2, grid=50):
+def draw_decision(X, y, classifier, at1, at2, lam, grid=50):
 
     points = np.take(X, [at1, at2], axis=1)
     maxx, maxy = np.max(points, axis=0)
@@ -25,24 +23,27 @@ def draw_decision(X, y, classifier, at1, at2, grid=50):
     prob = np.zeros([num, num])
     for xi,x in enumerate(np.linspace(minx, maxx, num=num)):
         for yi,y in enumerate(np.linspace(miny, maxy, num=num)):
-            #probability of the closest example
+            # probability of the closest example
             diff = points - np.array([x,y])
-            dists = (diff[:,0]**2 + diff[:,1]**2)**0.5 #euclidean
+            dists = (diff[:,0]**2 + diff[:,1]**2)**0.5 # euclidean
             ind = np.argsort(dists)
             prob[yi,xi] = classifier(X[ind[0]])[1]
 
-    pylab.imshow(prob, extent=(minx,maxx,maxy,miny))
+    pylab.imshow(prob, extent=(minx,maxx,maxy,miny), cmap="seismic")
 
     pylab.xlim(minx, maxx)
     pylab.ylim(miny, maxy)
     pylab.xlabel(at1)
     pylab.ylabel(at2)
 
+    pylab.title('Lambda = {0}'.format(lam), fontsize=20)
     pylab.show()
 
-X,y = load('reg.data')
 
-learner = LogRegLearner(lambda_=0.)
+X,y = solution.load('reg.data')
+
+lam = 2.3
+learner = solution.LogRegLearner(lambda_=lam)
 classifier = learner(X,y)
 
-draw_decision(X, y, classifier, 0, 1)
+draw_decision(X, y, classifier, 0, 1, lam)
