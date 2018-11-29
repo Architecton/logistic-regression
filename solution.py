@@ -206,7 +206,7 @@ def AUC(real, predictions):
 if __name__ == "__main__":
     X, y = load('reg.data')
 
-    # make a linearly spaced list of 500 lambda values on interval [0, 7]
+    # Make a linearly spaced list of 500 lambda values on interval [0, 7].
     lam_vals = np.linspace(0, 1, 10)
     acc_cv = np.empty(len(lam_vals), dtype=float)
     acc_auc = np.empty(len(lam_vals), dtype=float)
